@@ -7,6 +7,11 @@ import IconButton from "components/IconButton";
 import { AddIcon, EmailIcon } from "components/Icons";
 import TextBody from "components/TextBody";
 import {
+  DiscussionCard,
+  SectionTitle,
+  useCommunityPageStyles,
+} from "features/communities/CommunityPage";
+import {
   DISCUSSIONS_EMPTY_STATE,
   DISCUSSIONS_TITLE,
   NEW_POST_LABEL,
@@ -19,13 +24,7 @@ import {
 import { Community } from "pb/communities_pb";
 import { useState } from "react";
 import { useQueryClient } from "react-query";
-import { useHistory } from "react-router-dom";
-import { routeToCommunity } from "routes";
 import hasAtLeastOnePage from "utils/hasAtLeastOnePage";
-
-import { useCommunityPageStyles } from "./CommunityPage";
-import DiscussionCard from "./DiscussionCard";
-import SectionTitle from "./SectionTitle";
 
 const useStyles = makeStyles((theme) => ({
   discussionsContainer: {
@@ -50,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function DiscussionsSection({
+export default function DiscussionsListPage({
   community,
 }: {
   community: Community.AsObject;
@@ -65,11 +64,11 @@ export default function DiscussionsSection({
     error: discussionsError,
     data: discussions,
     hasNextPage: discussionsHasNextPage,
+    fetchNextPage,
   } = useListDiscussions(community.communityId);
 
   const queryClient = useQueryClient();
   const newDiscussionMutation = useNewDiscussionMutation(queryClient);
-  const history = useHistory();
 
   return (
     <>
@@ -125,17 +124,7 @@ export default function DiscussionsSection({
         )}
         {discussionsHasNextPage && (
           <div className={classes.loadMoreButton}>
-            <Button
-              onClick={() =>
-                history.push(
-                  routeToCommunity(
-                    community.communityId,
-                    community.slug,
-                    "discussions"
-                  )
-                )
-              }
-            >
+            <Button onClick={() => fetchNextPage()}>
               {SEE_MORE_DISCUSSIONS_LABEL}
             </Button>
           </div>
